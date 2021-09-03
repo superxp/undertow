@@ -155,6 +155,7 @@ public final class Undertow {
             listenerInfo = new ArrayList<>();
             for (ListenerConfig listener : listeners) {
                 UndertowLogger.ROOT_LOGGER.debugf("Configuring listener with protocol %s for interface %s and port %s", listener.type, listener.host, listener.port);
+                try {
                 final HttpHandler rootHandler = listener.rootHandler != null ? listener.rootHandler : this.rootHandler;
                 OptionMap socketOptionsWithOverrides = OptionMap.builder().addAll(socketOptions).addAll(listener.overrideSocketOptions).getMap();
                 if (listener.type == ListenerType.AJP) {
@@ -237,7 +238,10 @@ public final class Undertow {
                         listenerInfo.add(new ListenerInfo("https", sslServer.getLocalAddress(), openListener, xnioSsl, sslServer));
                     }
                 }
+                }catch (IOException e){
+                    UndertowLogger.ROOT_LOGGER.errorf("Configuring listener with protocol %s for interface %s and port %s  -- %s", listener.type, listener.host, listener.port,e.getMessage());
 
+                }
             }
 
         } catch (Exception e) {
